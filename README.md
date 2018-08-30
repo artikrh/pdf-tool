@@ -14,6 +14,8 @@ A tool which offers PDF file encryption in command line and brute forcing them u
       -w wordlist, --wordlist wordlist
                         Wordlist to brute force  
                         
+ ## Requirement
+     sudo pip2 install PyPDF2
  ## To Do
  - Threading
  - Support more options
