@@ -1,4 +1,4 @@
-# pdf-tool
+# pdf-tool [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 A tool which offers PDF file encryption in command line and brute forcing them using a local wordlist.
 
     usage: pdf.py [-h] [-e file -p password] [-d file -w wordlist]
@@ -15,6 +15,8 @@ A tool which offers PDF file encryption in command line and brute forcing them u
                         Wordlist to brute force  
                         
  ## Requirement
+ [PyPDF2](https://pythonhosted.org/PyPDF2/) library (case sensitive) is required for standard PDF operations.
+ 
      sudo pip2 install PyPDF2
  ## To Do
  - Threading
