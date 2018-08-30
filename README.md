@@ -1,7 +1,7 @@
 # pdf-tool [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 A tool which offers PDF file encryption in command line and brute forcing them using a local wordlist.
 
-    usage: pdf.py [-h] [-e file -p password] [-d file -w wordlist]
+    usage: pdf-tool.py [-h] [-e file -p password] [-d file -w wordlist]
 
     optional arguments:
       -h, --help            show this help message and exit
