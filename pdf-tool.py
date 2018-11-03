@@ -1,5 +1,8 @@
 #!/usr/bin/python
 import sys
+import multiprocessing
+from multiprocessing.dummy import Pool as ThreadPool
+from os import _exit
 import argparse
 import getpass
 from PyPDF2 import PdfFileReader, PdfFileWriter
@@ -16,30 +19,15 @@ parser.add_argument('-d','--decrypt',metavar='file',help='Brute force PDF',defau
 parser.add_argument('-w','--wordlist',metavar='wordlist',help='Wordlist to brute force',default=None)
 ns = parser.parse_args()
 
-#Validations
-if (len(sys.argv) != 5 and len(sys.argv) != 4):
-        print "Print -h for usage"
-        sys.exit()
-
-if(str(ns.password) != "None"):
-	if len([x for x in (ns.encrypt,ns.password) if x is not None]) == 1:
-		parser.error('encryption and password options must be given together')
-		sys.exit()
-
-if len([x for x in (ns.decrypt,ns.wordlist) if x is not None]) == 1:
-	parser.error('decryption and wordlist options must be given together')
-	sys.exit()
-
-# Encrypt
-if(str(ns.encrypt) != "None"):
+def encrypt():
 	try:
 		filename = ns.encrypt
 		if(str(ns.password) != "None"):
 			password = ns.password
 		else:
 			password = getpass.getpass()
-		ofilename = "encrypted_{}".format(filename)
 
+		ofilename = "{}-encrypted".format(filename)
 		input_pdf = PdfFileReader(open(ns.encrypt,"rb"))
 		out = PdfFileWriter()
 		out.appendPagesFromReader(input_pdf)
@@ -49,21 +37,51 @@ if(str(ns.encrypt) != "None"):
 	except:
 		print "{}[*]{} Error".format(CRED,CEND)
 
-# Brute force
-if(str(ns.decrypt) != "None" and str(ns.wordlist) != "None"):
+def brute(passwords):
 	pdf = PdfFileReader(open(ns.decrypt,"rb"))
+	try:
+		if(pdf.decrypt(passwords) == 1):
+			print "{}[*]{} Password is: {}".format(CGREEN,CEND,passwords)
+			_exit(0)
+	except:
+		print "\n{}[*]{} Exiting...".format(CRED,CEND)
 
-	if pdf.isEncrypted:
-		print "{}[*]{} File '{}' is encrypted. Brute forcing...".format(CPURP,CEND,ns.decrypt)
+def threading():
+        passwords = []
 
-		for i in open(ns.wordlist,"r"):
-			password = i.rstrip()
+	for pwds in open(ns.wordlist,"r"):
+		passwords.append(pwds.rstrip())
 
-			try:
-				if(pdf.decrypt(password) == 1):
-					print "{}[*]{} Password is: {}".format(CGREEN,CEND,password)
-					break
-			except:
-				print "{}[*]{} Error".format(CRED,CEND)
-	else:
-		print "{}[*]{} File '{}' is not password protected!".format(CRED,CEND,ns.decrypt)
+	pool = ThreadPool(multiprocessing.cpu_count())
+	pool.map(brute, passwords)
+	pool.close()
+	pool.join()
+
+if __name__ == "__main__":
+
+	# Validations
+	if (len(sys.argv) != 5 and len(sys.argv) != 4):
+        	print "Print -h for usage"
+        	sys.exit()
+
+	if(str(ns.password) != "None"):
+	        if len([x for x in (ns.encrypt,ns.password) if x is not None]) == 1:
+        	        parser.error('encryption and password options must be given together')
+                	sys.exit()
+
+	if len([x for x in (ns.decrypt,ns.wordlist) if x is not None]) == 1:
+        	parser.error('decryption and wordlist options must be given together')
+        	sys.exit()
+
+	# Process
+	if(str(ns.encrypt) != "None"):
+		encrypt()
+
+        if(str(ns.decrypt) != "None" and str(ns.wordlist) != "None"):
+		pdf = PdfFileReader(open(ns.decrypt,"rb"))
+
+		if pdf.isEncrypted:
+                	print "{}[*]{} File '{}' is encrypted. Brute forcing...".format(CPURP,CEND,ns.decrypt)
+			threading()
+		else:
+                	print "{}[*]{} File '{}' is not password protected!".format(CRED,CEND,ns.decrypt)
