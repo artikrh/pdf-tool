@@ -17,6 +17,6 @@ A tool which offers PDF file encryption in command line and brute forcing them u
  ## Requirement
  [PyPDF2](https://pythonhosted.org/PyPDF2/) library (case sensitive) is required for standard PDF operations.
  
-     sudo pip2 install PyPDF2
+     $ sudo pip2 install PyPDF2
  ## To Do
  - Support more options
